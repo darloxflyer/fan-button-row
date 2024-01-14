@@ -5,6 +5,13 @@ window.customCards.push({
   description: "A plugin to display your fan controls in a button row.",
   preview: false,
 });
+window.customCards.push({
+  type: "fan-state-button-row",
+  name: "fan state button row",
+  description: "A plugin to display 3-state fan controls in a button row.",
+  preview: false,
+});
+
 
 const LitElement = customElements.get("ha-panel-lovelace") ? Object.getPrototypeOf(customElements.get("ha-panel-lovelace")) : Object.getPrototypeOf(customElements.get("hc-lovelace"));
 const html = LitElement.prototype.html;
@@ -387,3 +394,254 @@ class CustomFanPercentRow extends LitElement {
 }
 
 customElements.define('fan-percent-button-row', CustomFanPercentRow);
+
+class CustomFanStateRow extends LitElement {
+
+	constructor() {
+		super();
+		this._config = {
+			customTheme: false,
+			customSetpoints: false,
+			hideOff: false,
+			allowDisablingButtons: true,
+			offValue: 'off',
+			autoValue: 'auto',
+			onValue: 'on',
+			width: '30px',
+			height: '30px',
+			isOffColor: '#f44c09',
+			isAutoColor: '#43A047',
+			isOnColor: '#43A047',
+			buttonInactiveColor: '#759aaa',
+			customOffText: 'OFF',
+			customAutoText: 'AUTO',
+			customOnText: 'ON',
+		};
+	}
+
+	static get properties() {
+		return {
+			hass: Object,
+			_config: Object,
+			_stateObj: Object,
+			_offSP: String,
+			_autoSP: String,
+			_onSP: String,
+			_width: String,
+			_height: String,
+			_onColor: String,
+			_autoColor: String,
+			_offColor: String,
+			_onText: String,
+			_autoText: String,
+			_offText: String,
+			_onName: String,
+			_autoName: String,
+			_offName: String,
+			_hideOn: String,
+			_hideAuto: String,
+			_hideOff: String,
+			_onState: Boolean,
+			_autoState: Boolean,
+			_offState: Boolean,
+		};
+	}
+
+	static get styles() {
+		return css`
+			:host {
+				line-height: inherit;
+			}
+			.box {
+				display: flex;
+				flex-direction: row;
+			}
+			.percentage {
+				margin-left: 2px;
+				margin-right: 2px;
+				background-color: #759aaa;
+				border: 1px solid lightgrey; 
+				border-radius: 4px;
+				font-size: 10px !important;
+				color: inherit;
+				text-align: center;
+				float: left !important;
+				padding: 1px;
+				cursor: pointer;
+			}
+		`;
+	}
+
+	render() {
+		return html`
+			<hui-generic-entity-row .hass="${this.hass}" .config="${this._config}">
+				<div id='button-container' class='box'>
+					<button
+						class='percentage'
+						style='${this._onColor};min-width:${this._width};max-width:${this._width};height:${this._height};${this._hideOn}'
+						toggles name="${this._onName}"
+						@click=${this.setState}
+						.disabled=${this._onState}>${this._onText}</button>
+					<button
+						class='percentage'
+						style='${this._autoColor};min-width:${this._width};max-width:${this._width};height:${this._height};${this._hideAuto}'
+						toggles name="${this._autoName}"
+						@click=${this.setState}
+						.disabled=${this._autoState}>${this._autoText}</button>
+					<button
+						class='percentage'
+						style='${this._offColor};min-width:${this._width};max-width:${this._width};height:${this._height};${this._hideOff}'
+						toggles name="${this._offName}"
+						@click=${this.setState}
+						.disabled=${this._offState}>${this._offText}</button>
+				</div>
+			</hui-generic-entity-row>
+		`;
+	}
+
+	firstUpdated() {
+		super.firstUpdated();
+		this.shadowRoot.getElementById('button-container').addEventListener('click', (ev) => ev.stopPropagation());
+	}
+
+	setConfig(config) {
+		this._config = { ...this._config, ...config };
+	}
+
+	updated(changedProperties) {
+		if (changedProperties.has("hass")) {
+			this.hassChanged();
+		}
+	}
+
+	hassChanged() {
+		const config = this._config;
+		const stateObj = this.hass.states[config.entity];
+		const custTheme = config.customTheme;
+		const custSetpoint = config.customSetpoints;
+		const hide_Off = config.hideOff;
+		const allowDisable = config.allowDisablingButtons;
+		const buttonWidth = config.width;
+		const buttonHeight = config.height;
+		const OnClr = config.isOnColor;
+		const OnAutoClr = config.isAutoColor;
+		const OffClr = config.isOffColor;
+		const buttonOffClr = config.buttonInactiveColor;
+		const custOffTxt = config.customOffText;
+		const custAutoTxt = config.customAutoText;
+		const custOnTxt = config.customOnText;
+
+		let offSetpoint;
+		let autoSetpoint;
+		let onSetpoint;
+		let auto;
+		let on;
+		let offstate;
+
+		offSetpoint = 0 //parseInt(OffSetpoint);
+		autoSetpoint = 66 //parseInt(MedSetpoint);
+		onSetpoint = 100 //parseInt(HiSetpoint);
+		if (stateObj && stateObj.attributes) {
+			if (stateObj.attributes.preset_mode == 'on') {
+				on = 'on';
+			} else if (stateObj.attribute.preset_mode == 'auto') {
+				auto = 'on';
+			} else {
+				offstate = 'on';
+			}
+		}
+
+		let autocolor;
+		let oncolor;
+		let offcolor;
+
+		if (custTheme) {
+			if (auto == 'on') {
+				autocolor = 'background-color:'  + OnAutoClr;
+			} else {
+				autocolor = 'background-color:' + buttonOffClr;
+			}
+			if (on == 'on') {
+				oncolor = 'background-color:'  + OnClr;
+			} else {
+				oncolor = 'background-color:' + buttonOffClr;
+			}
+			if (offstate == 'on') {
+				offcolor = 'background-color:'  + OffClr;
+			} else {
+				offcolor = 'background-color:' + buttonOffClr;
+			}
+		} else {
+			if (auto == 'on') {
+				autocolor = 'background-color: var(--switch-checked-color)';
+			} else {
+				autocolor = 'background-color: var(--switch-unchecked-color)';
+			}
+			if (on == 'on') {
+				oncolor = 'background-color: var(--switch-checked-color)';
+			} else {
+				oncolor = 'background-color: var(--switch-unchecked-color)';
+			}
+			if (offstate == 'on') {
+				offcolor = 'background-color: var(--switch-checked-color)';
+			} else {
+				offcolor = 'background-color: var(--switch-unchecked-color)';
+			}
+		}
+
+		let offtext = custOffTxt;
+		let autotext = custAutoTxt;
+		let ontext = custOnTxt;
+
+		let buttonwidth = buttonWidth;
+		let buttonheight = buttonHeight;
+
+		let offname = 'off'
+		let autoname = 'auto'
+		let onname = 'on'
+
+		let hideoff = 'display:block';
+		let hideauto = 'display:block';
+		let nohide = 'display:block';
+
+		this._stateObj = stateObj;
+		this._width = buttonwidth;
+		this._height = buttonheight;
+		this._offSP = offSetpoint;
+		this._autoSP = autoSetpoint;
+		this._onSP = hiSetpoint;
+
+		this._onState = (on === 'on' && allowDisable);
+		this._autoState = (auto === 'on' && allowDisable);
+		this._offState = (offstate == 'on' && allowDisable);
+		this._onColor = oncolor;
+		this._autoColor = autocolor;
+		this._offColor = offcolor;
+		this._onText = ontext;
+		this._autoText = autotext;
+		this._offText = offtext;
+		this._onName = onname;
+		this._autoName = autoname;
+		this._onName = offname;
+		this._hideoff = hideoff;
+		this._hideauto = hideauto;
+		this._hideon = hideon;
+	}
+
+	setState(e) {
+		const level = e.currentTarget.getAttribute('preset_mode');
+		const param = { entity_id: this._config.entity };
+
+		if( level == 'off' ) {
+			this.hass.callService('fan', 'set_preset_mode', param);
+		} else if (level == 'auto') {
+    		param.percentage = this._autoSP;
+			this.hass.callService('fan', 'set_preset_mode', param);
+		} else if (level == 'on') {
+			param.percentage = this._onSP;
+			this.hass.callService('fan', 'set_preset_mode', param);
+		}
+	}
+}
+
+customElements.define('fan-state-button-row', CustomFanStateRow);
