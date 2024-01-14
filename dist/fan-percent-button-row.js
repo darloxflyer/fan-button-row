@@ -444,6 +444,7 @@ class CustomFanStateRow extends LitElement {
 			_onState: Boolean,
 			_autoState: Boolean,
 			_offState: Boolean,
+			_fanStatus: String,
 		};
 	}
 
@@ -496,6 +497,11 @@ class CustomFanStateRow extends LitElement {
 						.disabled=${this._offState}>${this._offText}</button>
 				</div>
 			</hui-generic-entity-row>
+                        <hui-generic-entity-row .hass="${this.hass}" .config="${this._config}">
+				<div id="info pointer text-content' class='box'>
+    					Fan Status: ${this._fanStatus}
+    				</div>
+			</hui-generic-entity-row>
 		`;
 	}
 
@@ -537,6 +543,7 @@ class CustomFanStateRow extends LitElement {
 		let auto;
 		let on;
 		let offstate;
+		let fanstatus;
 
 		offSetpoint = 0 //parseInt(OffSetpoint);
 		autoSetpoint = 66 //parseInt(MedSetpoint);
@@ -548,6 +555,11 @@ class CustomFanStateRow extends LitElement {
 				auto = 'on';
 			} else {
 				offstate = 'on';
+			}
+			if (stateObj.state == 'on') {
+				fanstatus = '<span style="font-weight: bold; color: #046B1E;">ON</span>';
+			} else {
+				fanstatus = '<span style="font-weight: bold; color: #6B0505;">OFF</span>';
 			}
 		}
 
@@ -623,6 +635,7 @@ class CustomFanStateRow extends LitElement {
 		this._onName = onname;
 		this._autoName = autoname;
 		this._offName = offname;
+		this._fanStatus = fanstatus;
 	}
 
 	setState(e) {
