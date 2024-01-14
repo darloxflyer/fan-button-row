@@ -623,9 +623,6 @@ class CustomFanStateRow extends LitElement {
 		this._onName = onname;
 		this._autoName = autoname;
 		this._onName = offname;
-		this._hideoff = hideoff;
-		this._hideauto = hideauto;
-		this._hideon = hideon;
 	}
 
 	setState(e) {
