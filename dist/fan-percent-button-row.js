@@ -495,12 +495,11 @@ class CustomFanStateRow extends LitElement {
 						toggles name="${this._offName}"
 						@click=${this.setState}
 						.disabled=${this._offState}>${this._offText}</button>
+					<br clear="all" />
+     					<div id="info pointer text-content' class='box'>
+     						Fan Status: ${this._fanStatus}
+    					</div>
 				</div>
-			</hui-generic-entity-row>
-                        <hui-generic-entity-row .hass="${this.hass}" .config="${this._config}">
-				<div id="info pointer text-content' class='box'>
-    					Fan Status: ${this._fanStatus}
-    				</div>
 			</hui-generic-entity-row>
 		`;
 	}
