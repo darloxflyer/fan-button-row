@@ -630,12 +630,13 @@ class CustomFanStateRow extends LitElement {
 		const param = { entity_id: this._config.entity };
 
 		if( level == 'off' ) {
+			param.preset_mode = level;
 			this.hass.callService('fan', 'set_preset_mode', param);
 		} else if (level == 'auto') {
-    		param.percentage = this._autoSP;
+    		        param.preset_mode = level;
 			this.hass.callService('fan', 'set_preset_mode', param);
 		} else if (level == 'on') {
-			param.percentage = this._onSP;
+			param.preset_mode = level;
 			this.hass.callService('fan', 'set_preset_mode', param);
 		}
 	}
