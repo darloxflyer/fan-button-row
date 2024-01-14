@@ -609,7 +609,7 @@ class CustomFanStateRow extends LitElement {
 		this._height = buttonheight;
 		this._offSP = offSetpoint;
 		this._autoSP = autoSetpoint;
-		this._onSP = hiSetpoint;
+		this._onSP = onSetpoint;
 
 		this._onState = (on === 'on' && allowDisable);
 		this._autoState = (auto === 'on' && allowDisable);
