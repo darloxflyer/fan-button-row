@@ -622,11 +622,11 @@ class CustomFanStateRow extends LitElement {
 		this._offText = offtext;
 		this._onName = onname;
 		this._autoName = autoname;
-		this._onName = offname;
+		this._offName = offname;
 	}
 
 	setState(e) {
-		const level = e.currentTarget.getAttribute('preset_mode');
+		const level = e.currentTarget.getAttribute('name');
 		const param = { entity_id: this._config.entity };
 
 		if( level == 'off' ) {
