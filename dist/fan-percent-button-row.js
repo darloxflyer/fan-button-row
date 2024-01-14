@@ -544,7 +544,7 @@ class CustomFanStateRow extends LitElement {
 		if (stateObj && stateObj.attributes) {
 			if (stateObj.attributes.preset_mode == 'on') {
 				on = 'on';
-			} else if (stateObj.attribute.preset_mode == 'auto') {
+			} else if (stateObj.attributes.preset_mode == 'auto') {
 				auto = 'on';
 			} else {
 				offstate = 'on';
